@@ -1,272 +1,211 @@
-# 🤖 AI Image Classifier - Modern Web UI
+# 🤖 AI Image Classifier
 
-A beautiful, responsive web interface for Azure Custom Vision image classification with multiple deployment options.
+🚀 **Live Demo:**  
+👉 https://ai-image-classifier-dqn7.onrender.com/
 
-## Features ✨
-
-- **Modern Glassmorphism Design** - Sleek, contemporary UI with frosted glass effect
-- **Gradient Background** - Eye-catching purple-to-blue gradient aesthetic
-- **Responsive Layout** - Perfectly optimized for desktop, tablet, and mobile
-- **Smooth Animations** - Fluid transitions and hover effects
-- **Real-time Predictions** - See confidence percentages and classification results
-- **Professional Styling** - Built with Poppins font and modern CSS
-- **Multiple Deployment Options** - Choose between Streamlit, Flask, or standalone HTML
-
-## Installation
-
-### 1. Install Dependencies
-
-```bash
-pip install -r requirements-ui.txt
-```
-
-### 2. Configure Environment Variables
-
-Make sure your `.env` file exists in the `test-classifier/` directory with:
-
-```
-PredictionEndpoint='https://customvision90-prediction.cognitiveservices.azure.com/'
-PredictionKey='your-prediction-key-here'
-ProjectID='913c1b14-036e-4876-8c21-9f40b14b2d7b'
-ModelName='fruit-classifier'
-```
-
-## Usage Options
-
-### Option 1: Streamlit App (Recommended) 🎨
-
-Best for: Rapid development, easy deployment, beautiful UI with minimal code
-
-```bash
-streamlit run app.py
-```
-
-The app will:
-- Open in your browser at `http://localhost:8501`
-- Show a modern gradient background
-- Display a large, bold title
-- Provide image upload functionality
-- Show predictions with animated confidence bars
-- Display footer with "Built with ❤️ Mash157"
-
-**Features:**
-- Custom CSS with glassmorphism effects
-- Animated confidence bars
-- Top 5 predictions displayed
-- Responsive design for all devices
-- Beautiful error handling
-
-### Option 2: Standalone HTML UI 🌐
-
-Best for: Static deployment, CDN hosting, embedded use
-
-Simply open `index.html` in your browser:
-
-```bash
-# Windows
-start index.html
-
-# macOS
-open index.html
-
-# Linux
-xdg-open index.html
-```
-
-Or open it directly in your browser by typing the file path in the address bar.
-
-**Features:**
-- No server required for UI (pure frontend)
-- Works offline for UI/UX
-- Drag-and-drop image support
-- Mock predictions (update JavaScript to call actual API)
-- Smooth animations
-- Mobile responsive
-
-### Option 3: Flask Web App 🚀
-
-Best for: Full-stack deployment, REST API, production use
-
-```bash
-python flask_app.py
-```
-
-The app will:
-- Start a Flask server at `http://localhost:5000`
-- Serve the HTML UI with backend prediction support
-- Provide REST API endpoints for image classification
-- Handle CORS for cross-origin requests
-
-**API Endpoints:**
-
-```
-GET /                    - Serve the HTML interface
-POST /api/predict        - Classify an image
-GET /api/health          - Health check
-```
-
-**Example API Usage:**
-
-```bash
-# Upload and predict
-curl -X POST -F "file=@image.jpg" http://localhost:5000/api/predict
-
-# Health check
-curl http://localhost:5000/api/health
-```
-
-## Design Features 🎨
-
-### Glassmorphism Effect
-- Semi-transparent background with blur effect
-- Elegant frosted glass appearance
-- Modern and sophisticated look
-
-### Gradient Background
-- Purple to blue gradient (135deg)
-- Dynamic animation on page load
-- Mobile-optimized rendering
-
-### Responsive Breakpoints
-- **Desktop**: Full-width optimized layout
-- **Tablet** (768px): Adjusted font sizes and spacing
-- **Mobile** (480px): Compact design for small screens
-
-### Interactive Elements
-- Hover animations on buttons and cards
-- Drag-and-drop file upload
-- Animated confidence bars
-- Smooth transitions (0.3-0.8s easing)
-
-## File Structure
-
-```
-image-classification/python/
-├── app.py                  # Streamlit application
-├── flask_app.py           # Flask web server
-├── index.html             # Standalone HTML UI
-├── requirements-ui.txt    # Python dependencies
-├── README.md              # This file
-└── test-classifier/
-    ├── .env               # Environment variables
-    ├── test-classifier.py # Original classifier
-    └── test-images/       # Sample images
-```
-
-## Customization
-
-### Change Color Scheme
-
-**In Streamlit (app.py):**
-```css
-/* Change gradient colors */
-background: linear-gradient(135deg, #YOUR_COLOR1 0%, #YOUR_COLOR2 100%);
-```
-
-**In HTML (index.html):**
-Search for `#667eea` (purple) and `#764ba2` (dark purple) and replace with your colors.
-
-### Modify Footer
-
-**Streamlit:**
-```python
-st.markdown("""
-    <div class="footer">
-        <p>Your custom footer text here</p>
-    </div>
-    """, unsafe_allow_html=True)
-```
-
-**HTML:**
-```html
-<div class="footer">
-    <p>Your custom footer text</p>
-</div>
-```
-
-### Add More Predictions
-
-**Streamlit:**
-```python
-for tag_name, confidence in predictions_list[:10]:  # Show top 10 instead of 5
-```
-
-**HTML:**
-Update the JavaScript `displayResults` function to handle more predictions.
-
-## Troubleshooting
-
-### "PermissionDenied" Error
-- Verify you're using the **Prediction Key**, not Training Key
-- Check that the Prediction Endpoint matches your Azure resource
-- Ensure the key hasn't been regenerated
-
-### Module Not Found
-```bash
-pip install -r requirements-ui.txt
-```
-
-### Port Already in Use (Flask)
-```bash
-python flask_app.py  # Uses port 5000 by default
-```
-
-Change port in `flask_app.py`:
-```python
-app.run(port=5001)
-```
-
-### Slow Predictions
-- Check your internet connection to Azure
-- Verify your model is published in Custom Vision
-- Consider caching results for frequently classified images
-
-## Best Practices
-
-1. **Security**: Never commit `.env` files with real keys
-2. **Performance**: Compress images before uploading (< 5MB optimal)
-3. **UX**: Add loading indicators for users
-4. **Testing**: Test on actual devices, not just browser dev tools
-5. **Deployment**: Use environment variables for all sensitive data
-
-## Deployment Options
-
-### Streamlit Cloud
-```bash
-streamlit run app.py --logger.level=error
-```
-[Deploy to Streamlit Cloud](https://docs.streamlit.io/streamlit-community-cloud/deploy-your-app)
-
-### Azure App Service
-Deploy `flask_app.py` with a requirements.txt file.
-
-### GitHub Pages (HTML only)
-Push `index.html` to your repository and enable GitHub Pages.
-
-### Docker
-```dockerfile
-FROM python:3.11
-WORKDIR /app
-COPY requirements-ui.txt .
-RUN pip install -r requirements-ui.txt
-COPY . .
-CMD ["streamlit", "run", "app.py"]
-```
-
-## Credits
-
-Built with ❤️ by Mash157
-
-Powered by:
-- [Azure Custom Vision](https://www.customvision.ai)
-- [Streamlit](https://streamlit.io)
-- [Flask](https://flask.palletsprojects.com)
-- [Google Fonts - Poppins](https://fonts.google.com/specimen/Poppins)
-
-## License
-
-This project is open source and available under the MIT License.
+A modern, production-ready AI-powered image classification web application built using **Flask**, **Azure Custom Vision**, and deployed on **Render**.
 
 ---
 
-**Happy Classifying!** 🎉
+## 🌍 Live Application
+
+This app allows users to:
+
+- Upload an image
+- Send it to Azure Custom Vision
+- Receive classification results
+- View confidence percentages with animated bars
+- See the primary predicted class
+
+Fully responsive. Cloud deployed. CI/CD enabled.
+
+---
+
+# 🖼️ Application Screenshots
+
+## 🟣 1️⃣ Home Screen – Modern Glassmorphism UI
+
+![Home UI](docs/home.png)
+
+---
+
+## 🟢 2️⃣ Image Upload & Classification in Action
+
+![Upload](docs/upload.png)
+
+---
+
+## 🔵 3️⃣ Prediction Results with Confidence Bars
+
+![Results](docs/results.png)
+
+---
+
+## 🏗️ Tech Stack
+
+| Layer | Technology |
+|--------|------------|
+| Backend | Flask |
+| Production Server | Gunicorn |
+| AI Model | Azure Custom Vision |
+| UI | Modern HTML + CSS (Glassmorphism + Gradient Design) |
+| Hosting | Render |
+| Version Control | Git + GitHub |
+
+---
+
+## ✨ Features
+
+- 🎨 Modern glassmorphism UI
+- 🌈 Animated gradient background
+- 📱 Fully responsive layout
+- 📊 Real-time confidence bars
+- ☁️ Cloud-hosted AI model
+- 🚀 Auto deployment from GitHub
+- 🔐 Secure environment variables
+- 💡 REST API integration
+
+---
+
+## 📂 Project Structure
+
+```
+python/
+│
+├── flask_app.py
+├── app.py
+├── index.html
+├── templates/
+├── requirements.txt
+├── render.yaml
+├── docs/
+│   ├── home.png
+│   ├── upload.png
+│   └── results.png
+└── README.md
+```
+
+---
+
+## ⚙️ Local Installation
+
+### 1️⃣ Clone Repository
+
+```
+git clone https://github.com/mash157/imageclassifier-azure.git
+cd imageclassifier-azure/Labfiles/image-classification/python
+```
+
+---
+
+### 2️⃣ Create Virtual Environment
+
+```
+python -m venv venv
+venv\Scripts\activate   (Windows)
+```
+
+---
+
+### 3️⃣ Install Dependencies
+
+```
+pip install -r requirements.txt
+```
+
+---
+
+### 4️⃣ Configure Environment Variables
+
+Create a `.env` file:
+
+```
+PredictionEndpoint=your_endpoint
+PredictionKey=your_prediction_key
+ProjectID=your_project_id
+ModelName=your_model_name
+```
+
+---
+
+### 5️⃣ Run Flask App
+
+```
+python flask_app.py
+```
+
+Runs on:
+```
+http://localhost:5000
+```
+
+---
+
+## 🚀 Production Deployment (Render)
+
+Environment:
+
+- Runtime: Python
+- Build Command:
+```
+pip install -r requirements.txt
+```
+- Start Command:
+```
+gunicorn flask_app:app
+```
+- Environment Variable:
+```
+PYTHON_VERSION = 3.10.13
+```
+
+---
+
+## 🌐 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | / | Load UI |
+| POST | /api/predict | Classify image |
+| GET | /api/health | Health check |
+
+---
+
+## 🧠 How It Works
+
+1. User uploads image
+2. Flask backend sends image to Azure Custom Vision
+3. Azure returns top predictions
+4. Backend processes response
+5. UI displays ranked results with confidence bars
+
+---
+
+## 🔐 Security
+
+- API keys stored in environment variables
+- `.env` excluded via `.gitignore`
+- No secrets committed to GitHub
+- Production served via Gunicorn
+
+---
+
+## 🏆 Deployment Status
+
+✅ Live in Production  
+✅ Azure Model Connected  
+✅ Flask Backend Running  
+✅ Render Hosting Active  
+✅ CI/CD Enabled  
+
+---
+
+## 👨‍💻 Author
+
+Built with ❤️ by Mash157
+
+---
+
+## ⭐ Support
+
+If you like this project, give it a ⭐ on GitHub!
