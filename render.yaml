@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: ai-image-classifier
+    env: python
+    region: oregon
+    plan: free
+    runtime: python-3.11
+    buildCommand: pip install -r requirements-ui.txt
+    startCommand: gunicorn flask_app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: FLASK_ENV
+        value: production
+      - key: PredictionEndpoint
+        sync: false
+      - key: PredictionKey
+        sync: false
+      - key: ProjectID
+        sync: false
+      - key: ModelName
+        sync: false

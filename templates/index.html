@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Classifier | Mash157</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #06B6D4 0%, #7C3AED 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -2px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        /* Upload Section */
+        .upload-section h2 {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .upload-area:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.02);
+        }
+
+        .upload-area.dragover {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.12);
+            transform: scale(1.05);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .upload-text-small {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            display: none;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Button Styles */
+        .button {
+            background: linear-gradient(135deg, #06B6D4 0%, #7C3AED 100%);
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-top: 1rem;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .button:active {
+            transform: translateY(-1px);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .button-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Results Section */
+        .results {
+            display: none;
+            margin-top: 2rem;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-card h3 {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .prediction-item {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #06B6D4;
+            transition: all 0.3s ease;
+            animation: slideUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .prediction-item:nth-child(1) { animation-delay: 0.1s; }
+        .prediction-item:nth-child(2) { animation-delay: 0.2s; }
+        .prediction-item:nth-child(3) { animation-delay: 0.3s; }
+        .prediction-item:nth-child(4) { animation-delay: 0.4s; }
+        .prediction-item:nth-child(5) { animation-delay: 0.5s; }
+
+        .prediction-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+        }
+
+        .prediction-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .confidence-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+        }
+
+        .confidence-fill {
+            background: linear-gradient(90deg, #06B6D4 0%, #7C3AED 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .confidence-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Top Prediction Badge */
+        .top-prediction {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.3) 0%, rgba(124, 58, 237, 0.3) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.5);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .top-prediction h4 {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .top-prediction-value {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .top-prediction-conf {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top: 3px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        /* Error Message */
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            border-radius: 12px;
+            padding: 1rem;
+            color: rgba(255, 200, 200, 0.95);
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            display: none;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        /* Success Message */
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            border-radius: 12px;
+            padding: 1rem;
+            color: rgba(200, 255, 200, 0.95);
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            display: none;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .success.show {
+            display: block;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.3rem;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+                border-radius: 16px;
+            }
+
+            .upload-section h2 {
+                font-size: 1.2rem;
+            }
+
+            .button {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.95rem;
+                margin-top: 0.75rem;
+            }
+
+            .prediction-item {
+                padding: 1rem;
+            }
+
+            .prediction-label {
+                font-size: 1rem;
+            }
+
+            .top-prediction-value {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .header {
+                margin-bottom: 2rem;
+            }
+
+            .card {
+                padding: 1.25rem;
+            }
+
+            .upload-area {
+                padding: 1.5rem;
+            }
+
+            .upload-icon {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🤖 Image Classifier</h1>
+            <p>Powered by Azure Custom Vision AI</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <h2>📤 Upload an Image</h2>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">Click to upload or drag and drop</div>
+                    <div class="upload-text-small">PNG, JPG, GIF or BMP (maximum 10MB)</div>
+                </div>
+                <input type="file" id="imageInput" accept="image/*">
+            </div>
+
+            <!-- Image Preview -->
+            <div class="image-preview" id="imagePreview">
+                <img id="previewImg" src="" alt="Preview">
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div class="loading-text">Analyzing image...</div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error" id="error"></div>
+
+            <!-- Success Message -->
+            <div class="success" id="success"></div>
+
+            <!-- Results Section -->
+            <div class="results" id="results">
+                <div class="result-card">
+                    <h3>✅ Prediction Results</h3>
+                    <div id="predictionsContainer"></div>
+                </div>
+                <div class="top-prediction" id="topPrediction">
+                    <h4>🎯 Primary Classification</h4>
+                    <div class="top-prediction-value" id="topPredictionLabel"></div>
+                    <div class="top-prediction-conf" id="topPredictionConf"></div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <button class="button" id="classifyBtn" style="display: none;">Classify Image</button>
+            <button class="button button-secondary" id="clearBtn" style="display: none;">Clear</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Built with ❤️ by Mash157 | Powered by Azure Custom Vision</p>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const classifyBtn = document.getElementById('classifyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const error = document.getElementById('error');
+        const success = document.getElementById('success');
+        let selectedFile = null;
+
+        // Upload area click
+        uploadArea.addEventListener('click', () => imageInput.click());
+
+        // File input change
+        imageInput.addEventListener('change', (e) => {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                displayImage(selectedFile);
+            }
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            selectedFile = e.dataTransfer.files[0];
+            if (selectedFile && selectedFile.type.startsWith('image/')) {
+                displayImage(selectedFile);
+            } else {
+                showError('Please drop a valid image file');
+            }
+        });
+
+        function displayImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                imagePreview.style.display = 'block';
+                classifyBtn.style.display = 'block';
+                clearBtn.style.display = 'block';
+                results.style.display = 'none';
+                error.classList.remove('show');
+                success.classList.remove('show');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        classifyBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            error.classList.remove('show');
+            success.classList.remove('show');
+
+            try {
+                // Create FormData for file upload
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                // Send to backend API
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                loading.style.display = 'none';
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to classify image');
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data.predictions);
+                    showSuccess(`✅ Classification complete! Found ${data.totalPredictions} predictions.`);
+                } else {
+                    showError(data.error || 'Classification failed');
+                }
+            } catch (err) {
+                loading.style.display = 'none';
+                showError(err.message);
+            }
+        });
+
+        function displayResults(predictions) {
+            const container = document.getElementById('predictionsContainer');
+            container.innerHTML = '';
+
+            predictions.forEach(pred => {
+                const item = document.createElement('div');
+                item.className = 'prediction-item';
+                const confidence = (pred.confidence * 100).toFixed(1);
+                
+                item.innerHTML = `
+                    <div class="prediction-label">${pred.tag}</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="confidence-text">Confidence: ${confidence}%</div>
+                `;
+                
+                container.appendChild(item);
+
+                // Animate confidence bar
+                setTimeout(() => {
+                    item.querySelector('.confidence-fill').style.width = confidence + '%';
+                }, 50);
+            });
+
+            // Display top prediction
+            if (predictions.length > 0) {
+                const top = predictions[0];
+                document.getElementById('topPredictionLabel').textContent = top.tag;
+                document.getElementById('topPredictionConf').textContent = `${(top.confidence * 100).toFixed(1)}% Confidence`;
+            }
+
+            results.style.display = 'block';
+        }
+
+        clearBtn.addEventListener('click', () => {
+            imageInput.value = '';
+            selectedFile = null;
+            imagePreview.style.display = 'none';
+            results.style.display = 'none';
+            error.classList.remove('show');
+            success.classList.remove('show');
+            classifyBtn.style.display = 'none';
+            clearBtn.style.display = 'none';
+        });
+
+        function showError(message) {
+            error.textContent = '❌ ' + message;
+            error.classList.add('show');
+        }
+
+        function showSuccess(message) {
+            success.textContent = message;
+            success.classList.add('show');
+        }
+    </script>
+</body>
+</html>
